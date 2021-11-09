@@ -98,7 +98,6 @@ public class SearchEngine {
         // process query
         String[] keys = query.toLowerCase().split(" ");
         // search and output intersection results
-        // hint: list's addAll() and retainAll() methods could be helpful
         int found = 0;
         if (keys.length > 1) {
             LinkedList<String> intersection;
@@ -117,7 +116,8 @@ public class SearchEngine {
             }
             //the case that all of them exist in the keys
             else if (found == keys.length) {
-                    intersection = (LinkedList<String>) searchTree.findDataList(keys[found-1]).clone();
+                    intersection = (LinkedList<String>) searchTree.
+                            findDataList(keys[found-1]).clone();
                     for (int i = 0; i < keys.length; i++) {
                         if (searchTree.findKey(keys[i])) {
                             LinkedList<String> temp = new LinkedList<String>();

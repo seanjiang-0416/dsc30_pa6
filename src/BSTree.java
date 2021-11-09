@@ -141,7 +141,8 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
         }
 
         /**
-         * Remove 'data' from the linked list of the node and return true. If the linked
+         * Remove 'data' from the linked list of
+         * the node and return true. If the linked
          * list does not contain the value 'data', return false.
          *
          * @param data Info to be removed
