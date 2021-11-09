@@ -1,21 +1,23 @@
 /*
- * Name: TODO
- * PID:  TODO
+ * Name: Zhixing Jiang
+ * PID:  A16400450
  */
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Search Engine implementation.
  * 
- * @author TODO
- * @since  TODO
+ * @author Zhixing Jiang
+ * @since  November 8, 2021
  */
 public class SearchEngine {
+    private static final int ARG_TWO = 2;
+    private static final int OPTION_ZERO = 0;
+    private static final int OPTION_ONE = 1;
+    private static final int OPTION_TWO = 2;
 
     /**
      * Populate BSTrees from a file
@@ -45,8 +47,37 @@ public class SearchEngine {
 
                 /* TODO */
                 // populate three trees with the information you just read
-                // hint: create a helper function and reuse it to build all three trees
-
+                // insert the actors as keys and movie as data into the movieTree
+                for (String actor: cast) {
+                    actor = actor.toLowerCase();
+                    if (!movieTree.findKey(actor)) {
+                        movieTree.insert(actor);
+                    }
+                    if(!movieTree.findDataList(actor).contains(movie)) {
+                        movieTree.insertData(actor, movie);
+                    }
+                }
+                // insert the studio as keys and movie as data into the studioTree
+                for(String studio:studios){
+                    studio = studio.toLowerCase();
+                    if(!studioTree.findKey(studio)) {
+                        studioTree.insert(studio);
+                    }
+                    if(!studioTree.findDataList(studio).contains(movie)) {
+                        studioTree.insertData(studio, movie);
+                    }
+                }
+                // insert the actors as keys and ratings as data into the studioTree
+                for(String actor: cast) {
+                    actor = actor.toLowerCase();
+                    if(!ratingTree.findKey(actor)){
+                        ratingTree.insert(actor);
+                    }
+                    if(!ratingTree.findDataList(actor).contains(rating))
+                    {
+                        ratingTree.insertData(actor,rating);
+                    }
+                }
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -66,12 +97,83 @@ public class SearchEngine {
         /* TODO */
         // process query
         String[] keys = query.toLowerCase().split(" ");
-
         // search and output intersection results
         // hint: list's addAll() and retainAll() methods could be helpful
-
-        // search and output individual results
-        // hint: list's addAll() and removeAll() methods could be helpful
+        int found = 0;
+        if (keys.length > 1) {
+            LinkedList<String> intersection;
+            //check how many of the keys exist in the searchtree
+            for (int i = 0; i < keys.length; i++) {
+                if (searchTree.findKey(keys[i])) {
+                    found++;
+                }
+            }
+            //the case that none of them exist
+            if(found == 0){
+                print(query,null);
+                for(int i = 0; i < keys.length;i++){
+                    print(keys[i],null);
+                }
+            }
+            //the case that all of them exist in the keys
+            else if (found == keys.length) {
+                    intersection = (LinkedList<String>) searchTree.findDataList(keys[found-1]).clone();
+                    for (int i = 0; i < keys.length; i++) {
+                        if (searchTree.findKey(keys[i])) {
+                            LinkedList<String> temp = new LinkedList<String>();
+                            temp.addAll(searchTree.findDataList(keys[i]));
+                            intersection.retainAll(temp);
+                        }
+                    }
+                    print(query, intersection);
+                // search and output individual results
+                // hint: list's addAll() and removeAll() methods could be helpful
+                LinkedList<String> tank = new LinkedList<String>();
+                for (int i = 0; i < keys.length; i++) {
+                    if (searchTree.findKey(keys[i])) {
+                        LinkedList<String> temp_1 = new LinkedList<String>();
+                        temp_1.addAll(searchTree.findDataList(keys[i]));
+                        temp_1.removeAll(intersection);
+                        //remove everything that the previous keys contains
+                        temp_1.removeAll(tank);
+                        tank.addAll(searchTree.findDataList(keys[i]));
+                        //no need to print if it is empty is this case
+                        //based on the input output samples provided
+                        if(!temp_1.isEmpty()) {
+                            print(keys[i], temp_1);
+                        }
+                    }
+                }
+            }
+            //the case that some of them exist
+            else {
+                print(query, null);
+                LinkedList<String> tank = new LinkedList<String>();
+                for (int i = 0; i < keys.length; i++) {
+                    if (searchTree.findKey(keys[i])) {
+                        LinkedList<String> temp_1 = new LinkedList<String>();
+                        temp_1.addAll(searchTree.findDataList(keys[i]));
+                        //remove everything that the previous keys contains
+                        temp_1.removeAll(tank);
+                        tank.addAll(searchTree.findDataList(keys[i]));
+                        print(keys[i], temp_1);
+                    }
+                        else{
+                            print(keys[i],null);
+                    }
+                }
+            }
+        }
+        else{
+            if(searchTree.findKey(keys[0])) {
+                LinkedList<String> temp = new LinkedList<>();
+                temp.addAll(searchTree.findDataList(keys[0]));
+                print(keys[0], temp);
+            }
+            else{
+                print(keys[0],null);
+            }
+        }
 
     }
 
@@ -101,14 +203,30 @@ public class SearchEngine {
 
         /* TODO */
         // initialize search trees
-
+        BSTree<String> movieTree = new BSTree<String>();
+        BSTree<String> studioTree = new BSTree<String>();
+        BSTree<String> ratingTree = new BSTree<String>();
         // process command line arguments
         String fileName = args[0];
         int searchKind = Integer.parseInt(args[1]);
-
+        //convert the arguments from array into string
+        String query = "";
+        for (int i = ARG_TWO; i < args.length-1; i++){
+            query += args[i] + " ";
+        }
+        query += args[args.length-1];
         // populate search trees
 
+        populateSearchTrees(movieTree,studioTree,ratingTree,fileName);
         // choose the right tree to query
-
+        if(searchKind == OPTION_ZERO) {
+            searchMyQuery(movieTree, query);
+        }
+        else if(searchKind == OPTION_ONE){
+            searchMyQuery(studioTree, query);
+        }
+        else if(searchKind == OPTION_TWO){
+            searchMyQuery(ratingTree, query);
+        }
     }
 }

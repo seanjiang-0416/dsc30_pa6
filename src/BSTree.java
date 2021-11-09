@@ -199,15 +199,22 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
             throw new NullPointerException();
         }
         if (this.root == null) {
-            root = new BSTNode(null, null, key);
+            this.root = new BSTNode(null, null, key);
+            this.nelems++;
             return true;
         }
-        addshelper(this.root, key);
-
+        addhelper(this.root, key);
+        this.nelems++;
         return false;
     }
-
-    public boolean addshelper(BSTNode cur, T key) {
+    /**
+     * Helper method for the insertion method
+     *
+     * @param cur the current node
+     * @param key the key inserted to the BST
+     * @return the method for recursion or false
+     */
+    private boolean addhelper(BSTNode cur, T key) {
         int compare = key.compareTo(cur.getKey());
 
         if (compare == 0) {
@@ -217,14 +224,14 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
                 cur.setleft(new BSTNode(null, null, key));
                 return true;
             } else {
-                return addshelper(cur.getLeft(), key);
+                return addhelper(cur.getLeft(), key);
             }
         } else {
             if (cur.getRight() == null) {
                 cur.setright(new BSTNode(null, null, key));
                 return true;
             } else {
-                return addshelper(cur.getRight(), key);
+                return addhelper(cur.getRight(), key);
             }
         }
     }
@@ -241,10 +248,16 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
         if (key == null) {
             throw new NullPointerException();
         }
-        containshelper(this.root, key);
-        return false;
+        return containshelper(this.root, key);
     }
-
+    /**
+     * Check if the BST contains the key
+     *
+     * @param cur the current node
+     * @param key the key used to check if it is in the BST
+     * @return the method for recursion, true if the key is found
+     *      false if cur is null
+     */
     public boolean containshelper(BSTNode cur, T key) {
         if (cur == null) {
             return false;
@@ -319,8 +332,11 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
         if (this.root == null) {
             return -1;
         }
-        findHeightHelper(this.root);
-        return 0;
+        if(this.root.getLeft() == null && this.root.getRight()==null){
+            return 0;
+        }
+        return findHeightHelper(this.root);
+
     }
 
     /**
@@ -329,34 +345,40 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
      * @param root Root node
      * @return The height of the tree, -1 if BST is empty
      */
+
     private int findHeightHelper(BSTNode root) {
         /* TODO */
-        int leftHeight = 0;
-        int rightHeight = 0;
-        if (root.getLeft() != null) {
-            leftHeight = findHeightHelper(root.getLeft());
+        if(root == null){
+            return -1;
         }
-        if (root.getRight() != null) {
-            rightHeight = findHeightHelper(root.getLeft());
-        }
-        return 1 + Math.max(leftHeight, rightHeight);
+        return Math.max(findHeightHelper(root.left),
+                findHeightHelper(root.right)) + 1;
     }
 
     /* * * * * BST Iterator * * * * */
 
     public class BSTree_Iterator implements Iterator<T> {
-        Stack<T> iterator;
+        public Stack<T> iterator;
 
+        /**
+         * BSTree_Iterator initialize a stack that pushes all the
+         * left path elements and a root
+         */
         public BSTree_Iterator() {
             /* TODO */
             iterator = new Stack<T>();
             BSTNode cur = root;
-            while (cur.getLeft() != null) {
+            while (cur != null) {
                 iterator.push(cur.getKey());
                 cur = cur.getLeft();
             }
         }
-
+        /**
+         * Check if the iterator has the next element
+         *
+         * @return true if there is a next element
+         *      false if otherwise
+         */
         public boolean hasNext() {
             /* TODO */
             if (iterator.size() == 0) {
@@ -365,29 +387,31 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
                 return true;
             }
         }
-
+        /**
+         * Get the next element in the iterator
+         *
+         * @return the element that was popped out
+         * of the stack
+         */
         public T next() {
             /* TODO */
-            T output = iterator.pop();
-            BSTNode cur = findKeyHelper(root, output);
-            helperNext(cur);
+            if(iterator.size()==0){
+                throw new NoSuchElementException();
+            }
+            T output = this.iterator.pop();
+            BSTNode cur = findKeyHelper(root, output).getRight();
+            while (cur != null) {
+                iterator.push(cur.getKey());
+                cur = cur.getLeft();
+            }
             return (T) output;
         }
-
-        public void helperNext(BSTNode cur){
-
-            if(cur.getLeft() != null){
-                iterator.push(cur.getLeft().getKey());
-                helperNext(cur.getLeft());
-            }
-
-            if(cur.getRight() != null){
-                iterator.push(cur.getRight().getKey());
-                helperNext(cur.getRight());
-            }
-        }
     }
-
+        /**
+         * Initialize the iterator
+         *
+         * @return the new iterator
+         */
         public Iterator<T> iterator() {
             /* TODO */
             return new BSTree_Iterator();
@@ -395,15 +419,55 @@ public class BSTree<T extends Comparable<? super T>> implements Iterable {
 
 
     /* * * * * Extra Credit Methods * * * * */
-
+    /**
+     * Find the intersection between two iterators
+     *
+     * @return the intersection between two iterators
+     * in arraylist
+     */
     public ArrayList<T> intersection(Iterator<T> iter1, Iterator<T> iter2) {
         /* TODO */
+        ArrayList<T> array_1 = new ArrayList<T>();
+        while(iter1.hasNext()){
+            array_1.add(iter1.next());
+        }
+        ArrayList<T> array_2 = new ArrayList<T>();
+        while(iter2.hasNext()){
+            array_2.add(iter2.next());
+        }
+        ArrayList<T> output = new ArrayList<T>();
+        for(int i = 0; i < array_1.size(); i++){
+            if(array_2.contains(array_1.get(i))){
+                output.add(array_1.get(i));
+            }
+        }
+        Collections.sort(output);
+        return output;
+    }
+/*
+    public T levelMax(int level) {
+
+        int count = 0;
+        BSTNode cur = this.root;
+        while(true){
+            ArrayList<T> test = new ArrayList<T>();
+            if(level == count){
+
+                return
+            }
+            cur.getLeft();
+        }
         return null;
     }
 
-    public T levelMax(int level) {
-        /* TODO */
-        return null;
+    public T helperMax(BSTNode cur){
+        if(cur == null){
+
+        }
+        ArrayList<T> test = new ArrayList<T>();
+
+
     }
+    */
 }
 
