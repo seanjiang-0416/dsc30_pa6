@@ -158,8 +158,8 @@ public class SearchEngine {
                         tank.addAll(searchTree.findDataList(keys[i]));
                         print(keys[i], temp_1);
                     }
-                        else{
-                            print(keys[i],null);
+                    else{
+                        print(keys[i],null);
                     }
                 }
             }
