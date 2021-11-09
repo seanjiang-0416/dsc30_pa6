@@ -1,10 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -368,4 +365,85 @@ public class BSTreeTester {
 
     }
 
+    @Test(expected = NullPointerException.class)
+    public void test_exception_1(){
+        test.insert(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_2() {
+        test.insert(50);
+        test.insert(60);
+        test.findKey(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_3() {
+        test.insert(50);
+        test.insert(60);
+        test.findKey(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_4(){
+        test.insert(50);
+        test.insert(60);
+        test.insertData(null, 12);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_5(){
+        test.insert(50);
+        test.insert(60);
+        test.insertData(50, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_exception_6(){
+        test.insert(50);
+        test.insert(60);
+        test.insertData(80, 12);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_7(){
+        test.insert(50);
+        test.insert(60);
+        test.findDataList(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_8(){
+        test.insert(50);
+        test.insert(60);
+        test.insertData(50, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_exception_9(){
+        test.insert(50);
+        test.insert(60);
+        test.findDataList(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_exception_10(){
+        test.insert(50);
+        test.insert(60);
+        test.findDataList(80);
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void test_exception_11(){
+        test_1.insert("B");
+        test_1.insert("A");
+        test_1.insert("D");
+        test_1.insert("E");
+        Iterator<String> iter = test_1.iterator();
+        assertEquals("A",iter.next());
+        assertEquals("B",iter.next());
+        assertEquals("D",iter.next());
+        assertEquals("E",iter.next());
+        iter.next();
+    }
 }
